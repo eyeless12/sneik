@@ -1,0 +1,1 @@
+![Картинка](./s.png?raw=true "Sneik")
