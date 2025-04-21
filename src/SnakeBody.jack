@@ -21,6 +21,13 @@ class SnakeBody {
         return this;
     }
 
+    method void dispose() {
+        
+        do Memory.deAlloc(this);
+
+        return;
+    }
+
     method int getHeadY(){
         return _headY;
     }

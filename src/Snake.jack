@@ -41,6 +41,7 @@ class Snake {
     method void dispose() {
         
         do Memory.deAlloc(this);
+        do _body.dispose();
 
         return;
     }
@@ -195,6 +196,8 @@ class Snake {
 
     method int canMove(int direction){
 
+        // по поводу -1 - не знаю как по другому сделать. в нормальных языках использовал бы енам для наглядности
+        // или просто кидал бы исключение вместо -1 и там обрабатывал
         if (direction = Settings.left()){
             if (~(_lastHeadDirection = Settings.right())){
                 if (_headX > Settings.minScreenX()){

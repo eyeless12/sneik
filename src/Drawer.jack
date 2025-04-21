@@ -1,0 +1,159 @@
+class Drawer {
+    field int _score;
+    field int _sec;
+    field int _statusBarHeight;
+
+    constructor Drawer new(int statusBarHeight) {
+        let _sec = 0;
+        let _score = 0;
+        let _statusBarHeight = statusBarHeight;
+
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+
+        return;
+    }
+
+    method void gameOver(){
+        var String tString;
+
+        do Output.moveCursor(11, 26);
+        let tString = "Game Over!!!";
+        do Output.printString(tString);
+        do tString.dispose();
+        do Sys.wait(2000);
+
+        return;
+    }
+
+    method void welcome(){
+        var int input;
+        var String tString;
+
+        let tString = "Snake by m.a.chevychelov";
+        do Output.moveCursor(11, 31 - (tString.length() / 2));
+        do Output.printString(tString);
+        do tString.dispose();
+
+        do Sys.wait(2000);
+
+        do Screen.clearScreen();
+
+        let input = Keyboard.keyPressed();
+
+        while (~(input = 128)){
+
+            do Sys.wait(400);
+            
+            let input = Keyboard.keyPressed();
+
+            do Output.moveCursor(11, 31 - (tString.length() / 2));
+            let tString = "Press and hold Enter to start";
+            do Output.printString(tString);
+            do tString.dispose();
+
+            do Sys.wait(400);
+
+            do Screen.clearScreen();
+        }
+
+        return;
+    }    
+
+    method void drawStatusBar(){
+
+        var String tString;
+
+        do Screen.setColor(true);
+        do Screen.drawLine(0, 256 - (_statusBarHeight - 1), 512 - 1, 256 - (_statusBarHeight - 1));
+
+        do Output.moveCursor(22, 2);
+        let tString = "Max Chevychelov";
+        do Output.printString(tString);
+        do tString.dispose();
+
+        do Output.moveCursor(22, 28);
+        let tString = "Score: ";
+        do Output.printString(tString);
+        do tString.dispose();
+        do Output.printInt(_score);
+        
+        do Output.moveCursor(22, 50);
+        let tString = "Time: ";
+        do Output.printString(tString);
+        do tString.dispose();
+        do Output.printInt(_sec);
+
+        return;
+    }
+
+    method void drawDebugStatusBar(){
+
+        var String tString;
+
+        do Screen.setColor(true);
+        do Screen.drawLine(0, 256 - (_statusBarHeight - 1), 512 - 1, 256 - (_statusBarHeight - 1));
+
+        do Output.moveCursor(22, 1);
+        let tString = "Head: (";
+        do Output.printString(tString);
+        do Output.printInt(_snake.getAbsTailX());
+        do Output.printString(", ");
+        do Output.printInt(_snake.getAbsTailY());
+        do Output.printString(")");
+        do tString.dispose();
+
+        do Output.moveCursor(22, 1 + 14 + 1);
+        let tString = "Tail: (";
+        do Output.printString(tString);
+        do Output.printInt(_snake.getTailX());
+        do Output.printString(", ");
+        do Output.printInt(_snake.getTailY());
+        do Output.printString(")");
+        do tString.dispose();
+
+        do Output.moveCursor(22, 1 + 14 + 1 + 15 + 1);
+        let tString = "LT: (";
+        do Output.printString(tString);
+        do Output.printInt(_snake.getLastTailX());
+        do Output.printString(", ");
+        do Output.printInt(_snake.getLastTailY());
+        do Output.printString(")");
+        do tString.dispose();
+
+        do Output.printString(" ");
+        if (_snake.getEatFlag()){
+            do Output.printString("True  ");
+        }
+        if (~_snake.getEatFlag()){
+            do Output.printString("False ");
+        }
+        do tString.dispose();
+
+        do Output.moveCursor(22, 1 + 14 + 1 + 15 + 1 + 10 + 1 + 6);
+        let tString = "Food: (";
+        do Output.printString(tString);
+        do Output.printInt(_food.getX());
+        do Output.printString(", ");
+        do Output.printInt(_food.getY());
+        do Output.printString(")");
+        do tString.dispose();
+
+        return;
+    }
+
+    method void incrementSec() 
+    {
+        let _sec = _sec + 1;
+        return;
+    }
+
+    method void incrementScore() 
+    {
+        let _score = _score + 1;
+        return;
+    }
+}

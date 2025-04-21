@@ -1,25 +1,51 @@
-// Snake new(int x, int y, int squareHeight, int moveSpeed)
-// Food new(int x, int y, int foodSize){
-// GameManager new(Snake snake)
-
 class Main {
     static GameManager gameManager;
     static Snake snake;
 
     function void main () {
+        var boolean exit;
+        var boolean welcome;
+        var int key;
+        var String tString;
 
         do Settings.init();
+        let exit = false;
+        let welcome = true;
 
-        // headX, headY, squareSize, moveSpeed
-        let snake = Snake.new(20, 20, 8, 4);
+        while (~exit) 
+        {
+            let snake = Snake.new(20, 20, 8, 4);
 
-        let gameManager = GameManager.new(snake);
+            let gameManager = GameManager.new(snake);
 
-        do gameManager.run();
-        do gameManager.dispose();
+            do gameManager.run(welcome);
+            do gameManager.dispose();
+            do Screen.clearScreen();
+
+            let key = Keyboard.keyPressed();
+
+            let welcome = false;
+            while (~(key = 128)){
+
+                do Sys.wait(400);
+                let key = Keyboard.keyPressed();
+
+                let tString = "Press and hold Enter to start or Esc to exit";
+                do Output.moveCursor(11, 34 - (tString.length() / 2));
+                do Output.printString(tString);
+                do tString.dispose();
+
+                do Sys.wait(400);
+
+                do Screen.clearScreen();
+
+                if (key = 140)
+                {
+                    return;
+                }
+            }
+        }
         
         return;
     }
-
-    
 }

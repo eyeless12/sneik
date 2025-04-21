@@ -1,26 +1,19 @@
 class GameManager {
     field Snake _snake;
+    field Drawer _drawer;
     field Food _food;
     field int _squareSize;
     field int _time;
     field int _delayTime;
-    field int _sec;
-    field int _min;
-    field int _hour;
-    field int _statusBarHeight;
 
     constructor GameManager new(Snake snake){
         let _snake = snake;
         let _squareSize = _snake.getSquareSize();
         let _food = Food.new(Settings.maxScreenX() / 2, Settings.maxScreenY() / 2, _squareSize);
+        let _drawer = Drawer.new(16);
 
         let _time = 0;
         let _delayTime = 1000 / (_snake.getMoveSpeed() * 5);
-        let _sec = 0;
-        let _min = 0;
-        let _hour = 0;
-
-        let _statusBarHeight = 16;
 
         return this;
     }
@@ -29,21 +22,22 @@ class GameManager {
 
         do _snake.dispose();
         do _food.dispose();
+        do _drawer.dispose();
 
         do Memory.deAlloc(this);
 
         return;
     }
 
-    method void run(){
+    method void run(boolean welcome){
         var boolean exit;
         var int key;
         
         let exit = false;
         let key = 0;
 
-        if (~Settings.isDebug()){
-            do welcome();
+        if (welcome){
+            do _drawer.welcome();
         }
 
         do Screen.clearScreen();
@@ -65,7 +59,8 @@ class GameManager {
                     do _snake.move(_snake.getHeadDirection());
                 }
                 if (_snake.canMove(key) = -1){
-                    do gameOver();
+                    do clearFood();
+                    do _drawer.gameOver();
 
                     return;
                 }
@@ -76,7 +71,8 @@ class GameManager {
                         do _snake.move(_snake.getHeadDirection());
                     }
                     if (_snake.canMove(_snake.getHeadDirection()) = -1){
-                        do gameOver();
+                        do clearFood();
+                        do _drawer.gameOver();
     
                         return;
                     }
@@ -85,14 +81,15 @@ class GameManager {
     
             if (isCollidedWithFood()){
                 do _snake.eat();
+                do _drawer.incrementScore();
                 do spawnFood();
             }
 
             if (~Settings.isDebug()){
-                do drawStatusBar();
+                do _drawer.drawStatusBar();
             }
             if (Settings.isDebug()){
-                do drawDebugStatusBar();
+                do _drawer.drawDebugStatusBar();
             }
 
             do Sys.wait(_delayTime);
@@ -123,135 +120,6 @@ class GameManager {
         return;
     }
 
-    method void drawStatusBar(){
-
-        var String tString;
-
-        do Screen.setColor(true);
-        do Screen.drawLine(0, 256 - (_statusBarHeight - 1), 512 - 1, 256 - (_statusBarHeight - 1));
-
-        do Output.moveCursor(22, 2);
-        let tString = "Max Chevychelov";
-        do Output.printString(tString);
-        do tString.dispose();
-
-        do Output.moveCursor(22, 28);
-        let tString = "Score: ";
-        do Output.printString(tString);
-        do tString.dispose();
-        do Output.printInt(_snake.getLength());
-        
-        do Output.moveCursor(22, 50);
-        let tString = "Time: ";
-        do Output.printString(tString);
-        do tString.dispose();
-        do Output.printInt(_sec);
-
-        return;
-    }
-
-    method void drawDebugStatusBar(){
-
-        var String tString;
-
-        do Screen.setColor(true);
-        do Screen.drawLine(0, 256 - (_statusBarHeight - 1), 512 - 1, 256 - (_statusBarHeight - 1));
-
-        do Output.moveCursor(22, 1);
-        let tString = "Head: (";
-        do Output.printString(tString);
-        do Output.printInt(_snake.getAbsTailX());
-        do Output.printString(", ");
-        do Output.printInt(_snake.getAbsTailY());
-        do Output.printString(")");
-        do tString.dispose();
-
-        do Output.moveCursor(22, 1 + 14 + 1);
-        let tString = "Tail: (";
-        do Output.printString(tString);
-        do Output.printInt(_snake.getTailX());
-        do Output.printString(", ");
-        do Output.printInt(_snake.getTailY());
-        do Output.printString(")");
-        do tString.dispose();
-
-        do Output.moveCursor(22, 1 + 14 + 1 + 15 + 1);
-        let tString = "LT: (";
-        do Output.printString(tString);
-        do Output.printInt(_snake.getLastTailX());
-        do Output.printString(", ");
-        do Output.printInt(_snake.getLastTailY());
-        do Output.printString(")");
-        do tString.dispose();
-
-        do Output.printString(" ");
-        if (_snake.getEatFlag()){
-            do Output.printString("True  ");
-        }
-        if (~_snake.getEatFlag()){
-            do Output.printString("False ");
-        }
-        do tString.dispose();
-
-        do Output.moveCursor(22, 1 + 14 + 1 + 15 + 1 + 10 + 1 + 6);
-        let tString = "Food: (";
-        do Output.printString(tString);
-        do Output.printInt(_food.getX());
-        do Output.printString(", ");
-        do Output.printInt(_food.getY());
-        do Output.printString(")");
-        do tString.dispose();
-
-        return;
-    }
-
-    method void welcome(){
-        var int input;
-        var String tString;
-
-        let tString = "Snake by m.a.chevychelov";
-        do Output.moveCursor(11, 31 - (tString.length() / 2));
-        do Output.printString(tString);
-        do tString.dispose();
-
-        do Sys.wait(2000);
-
-        do Screen.clearScreen();
-
-        let input = Keyboard.keyPressed();
-
-        while (~(input = 128)){
-
-            do Sys.wait(400);
-            
-            let input = Keyboard.keyPressed();
-
-            do Output.moveCursor(11, 31 - (tString.length() / 2));
-            let tString = "Press and hold Enter to start";
-            do Output.printString(tString);
-            do tString.dispose();
-
-            do Sys.wait(400);
-
-            do Screen.clearScreen();
-        }
-
-        return;
-    }
-
-    method void gameOver(){
-        var String tString;
-
-        do clearFood();
-
-        do Output.moveCursor(11, 26);
-        let tString = "Game Over!!!";
-        do Output.printString(tString);
-        do tString.dispose();
-
-        return;
-    }
-
     method boolean isCollidedWithFood(){
         if (_snake.getHeadX() = _food.getX()){
             if (_snake.getHeadY() = _food.getY()){
@@ -270,17 +138,7 @@ class GameManager {
         }
 
         if (Util.mod(_time, 1000) = 0){
-            let _sec = _sec + 1;
-        }
-
-        if (Util.mod(_sec, 60) = 0){
-            let _sec = 0;
-            let _min = _min + 1;
-        }
-
-        if (Util.mod(_min, 60) = 0){
-            let _min = 0;
-            let _hour = _hour + 1;
+            do _drawer.incrementSec();
         }
 
         return;

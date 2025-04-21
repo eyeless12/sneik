@@ -2,15 +2,11 @@ class Settings {
 
     static int _squareSize; 
 
-    // Apply Settings
     function void init(){
         let _squareSize = 8;
 
         return;
     }
-
-    
-    // Game Settings
 
     function int squareSize(){
         return _squareSize;
@@ -21,9 +17,6 @@ class Settings {
 
         return;
     }
-
-
-    // Environment Settings
 
     function int left(){
         return 130;
